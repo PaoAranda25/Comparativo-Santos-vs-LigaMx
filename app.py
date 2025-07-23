@@ -177,7 +177,7 @@ for grupo in grupos:
         fig.add_trace(go.Bar(
             y=[cat], x=[ -val_cl25], orientation='h',
             marker_color=obtener_color(val_cl25), text=[f"{val_cl25:.0f}"],
-            textposition="outside", showlegend=(i == 0), width=0.35, name="CL25"
+            textposition="outside", showlegend=(i == 0), width=0.35
         ))
 
         fig.add_trace(go.Scatter(
