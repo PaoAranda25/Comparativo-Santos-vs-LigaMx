@@ -5,10 +5,18 @@ import plotly.graph_objects as go
 import openpyxl
 
 
-# === Cargar archivo Excel
-df = pd.read_excel("Matrix Jugadores AP25.xlsx",header=1)
-df.columns = df.columns.str.upper()
+# ========== STREAMLIT =========
+# Mostrarlo arriba a la izquierda
+st.markdown(f"<h3 style='text-align: center; padding: 0.3em'>Comparativa estadística Santos vs Liga Mx</h3>", unsafe_allow_html=True)
+analisis = st.selectbox("Selecciona un análisis:", ["Jornada", "Torneo"])
 
+if analisis == "Jornada":
+    # === Cargar archivo Excel
+    df = pd.read_excel("Matrix Jugadores Jornada.xlsx",header=1)
+    df.columns = df.columns.str.upper()
+else:
+    df = pd.read_excel("Matrix Jugadores Torneo.xlsx",header=1)
+    df.columns = df.columns.str.upper()
 
 # === Lista de métricas a convertir a P90
 estadisticas = [
@@ -51,26 +59,18 @@ for stat in estadisticas:
 
 # === Dividir Santos y resto del torneo
 santos = df[df["EQUIPO"].str.contains("Santos Laguna", case=False, na=False)].copy()
-print(santos)
 santos.to_csv("SANTOS.csv", index=False, encoding="utf-8-sig")
 resto = df.copy()
-print(resto)
 resto.to_csv("RESTO.csv", index=False, encoding="utf-8-sig")
 
 
 # === Promedio por posición (resto del torneo)
 p90_santos = santos.groupby("POSICION")[[f"{e}_P90" for e in estadisticas]].max().reset_index()
-print(p90_santos)
 p90_santos.to_csv("P90SANTOS.csv", index=False, encoding="utf-8-sig")
 
-p90_resto = resto.groupby("POSICION")[[f"{e}_P90" for e in estadisticas]].mean().reset_index()
-print(p90_resto)
+
+p90_resto = resto.groupby("POSICION")[[f"{e}_P90" for e in estadisticas]].max().reset_index()
 p90_resto.to_csv("P90RESTO.csv", index=False, encoding="utf-8-sig")
-
-
-# ========== STREAMLIT =========
-# Mostrarlo arriba a la izquierda
-st.markdown(f"<h3 style='text-align: center; padding: 0.3em'>Comparativo CL25 vs AP24</h3>", unsafe_allow_html=True)
 
 
 bd = pd.read_csv("SANTOS.csv")
@@ -82,8 +82,6 @@ categorias = pd.read_csv("categorias_por_posicion_y_grupo_utf8.csv")
 categorias["Categoría"] = categorias["Categoría"].str.upper()
 
 
-print( bd)
-
 
 
 jugadores = bd["JUGADOR"].unique()
@@ -92,15 +90,20 @@ jugadores = bd["JUGADOR"].unique()
 if len(jugadores) > 0:
     jugador = st.selectbox("Selecciona un jugador", jugadores, index=0)
     posicion = bd[bd["JUGADOR"] == jugador]["POSICION"].values[0]
+    minutos= bd[bd["JUGADOR"]== jugador]["MINUTOS JUGADOS"].values[0]
     st.markdown(f"""
     <div style="font-size: 20px; color: #444; margin-top: -0.5rem;">
         <strong>Posición:</strong><br>{posicion}
     </div>
 """, unsafe_allow_html=True)
+    st.markdown(f"""
+    <div style="font-size: 20px; color: #444; margin-top: -0.5rem;">
+        <strong>Minutos jugados:</strong><br>{int(minutos)}
+    </div>
+""", unsafe_allow_html=True)
 else:
     st.warning("No hay jugadores disponibles para esta jornada.")
     st.stop() 
-
 
 # Función de color
 def obtener_color(valor):
@@ -118,75 +121,74 @@ def obtener_color(valor):
 # Mostrar por grupo
 grupos = ["Ofensivo", "Defensivo", "Posesión", "Conducción"]
 
+
 for grupo in grupos:
     st.markdown(f"<h3 style='text-align: center; padding: 0.3em'>{grupo.upper()}</h3>", unsafe_allow_html=True)
-
-    if grupo == "Ofensivo":
-        st.markdown("<p style='text-align: center; font-size: 13px'><em>*Para los duelos No exitosos, entre más baja la barra, mejor promedio</em></p>", unsafe_allow_html=True)
-    elif grupo == "Defensivo":
-        st.markdown("<p style='text-align: center; font-size: 13px'><em>*Para los 1 vs 1 no exitosos entre más baja la barra, mejor promedio</em></p>", unsafe_allow_html=True)
-    elif grupo == "Conducción":
-        st.markdown("<p style='text-align: center; font-size: 13px'><em>*Para las categorías de conducción entre más abajo la barra mejor promedio</em></p>", unsafe_allow_html=True)
-
-    # === Procesar categorías del grupo
-    cat_grupo = categorias[
-        (categorias["Posición"].str.upper() == posicion.upper()) &
-        (categorias["Grupo"].str.upper() == grupo.upper())
-    ]["Categoría"].tolist()
-
-    # Convertir a mayúsculas y agregar _P90
-    cat_grupo = [f"{cat.upper()}_P90" for cat in cat_grupo]
-
-    # Verificar que existan en todos los DataFrames
-    cat_grupo_existentes = [
-        cat for cat in cat_grupo
-        if cat in bd.columns and cat in p90ap24.columns and cat in p90cl25.columns
-    ]
-
-    cat_grupo_existentes = [cat for cat in cat_grupo if cat in bd.columns and cat in p90ap24.columns and cat in p90cl25.columns]
-
+    if grupo in ["Ofensivo"]:
+        st.markdown(
+        "<p style='text-align: center; font-size: 13px'><em>*Para los duelos No exitosos, entre más baja la barra, mejor promedio</em></p>",
+        unsafe_allow_html=True
+    )
+    if grupo in ["Defensivo"]:
+        st.markdown(
+        "<p style='text-align: center; font-size: 13px'><em>*Para los 1 vs 1 no exitosos entre más baja la barra, mejor promedio</em></p>",
+        unsafe_allow_html=True
+    )
+        
+    if grupo in ["Conducción"]:
+        st.markdown(
+        "<p style='text-align: center; font-size: 13px'><em>*Para las categorías de conducción entre más abajo la barra mejor promedio</em></p>",
+        unsafe_allow_html=True
+    )        
+    cat_grupo = categorias[(categorias["Posición"] == posicion) & (categorias["Grupo"] == grupo)]["Categoría"].tolist()
+    cat_grupo_existentes = [cat for cat in cat_grupo if cat in bd.columns]
 
     if not cat_grupo_existentes:
         st.warning("Este jugador no tiene datos para este grupo de métricas.")
         continue
 
-    # Datos jugador (Santos)
-    df_izq = bd[bd["JUGADOR"] == jugador][cat_grupo_existentes].T.reset_index()
+    # Obtener valores CL25
+    df_izq = bd[bd["JUGADOR"] == jugador][[f"{cat}_P90" for cat in cat_grupo_existentes]].T.reset_index()
     df_izq.columns = ["Categoría", "Valor"]
+    df_izq["Categoría"] = df_izq["Categoría"].str.replace("_P90", "")
 
-    # Datos promedio por posición
-    if posicion in p90ap24["POSICION"].values:
-        df_der = p90ap24[p90ap24["POSICION"] == posicion][cat_grupo_existentes].T.reset_index()
-        df_der.columns = ["Categoría", "Valor"]
-    else:
-        df_der = pd.DataFrame({"Categoría": cat_grupo_existentes, "Valor": [0]*len(cat_grupo_existentes)})
+    # Obtener promedio del torneo (resto) por posición
+    df_der = p90ap24[p90ap24["POSICION"] == posicion][[f"{cat}_P90" for cat in cat_grupo_existentes]].T.reset_index()
+    df_der.columns = ["Categoría", "Valor"]
+    df_der["Categoría"] = df_der["Categoría"].str.replace("_P90", "")
 
-    # Gráfico
+    print(df_izq)
+    print(df_der)
+    
     fig = go.Figure()
 
-for i, cat in enumerate(cat_grupo_existentes):
-    real_val_jugador = float(df_izq.loc[df_izq["Categoría"] == cat, "Valor"].values[0])
-    real_val_promedio = float(df_der.loc[df_der["Categoría"] == cat, "Valor"].values[0])
-
-    val_jugador = (real_val_jugador / real_val_promedio) * 100 if real_val_promedio > 0 else 0
-    val_promedio = 100
-
-    fig.add_trace(go.Bar(
-        y=[cat], x=[-val_jugador], orientation='h',
-        marker_color=obtener_color(val_jugador), text=[f"{real_val_jugador:.0f}"],
-        textposition="outside", showlegend=(i == 0), width=0.35, name="Jugador"
-    ))
-
-    fig.add_trace(go.Bar(
-        y=[cat], x=[val_promedio], orientation='h',
-        marker_color=obtener_color(val_promedio), text=[f"{real_val_promedio:.0f}"],
-        textposition="outside", showlegend=(i == 0), width=0.35, name="Promedio posición"
-    ))
+    for i, cat in enumerate(cat_grupo_existentes):
+        valor_cl25 = float(df_izq.loc[df_izq["Categoría"] == cat, "Valor"].values[0])
+        valor_ap24 = float(df_der.loc[df_der["Categoría"] == cat, "Valor"].values[0])
 
 
-    fig.add_annotation(x=-120, y=len(cat_grupo_existentes), text="P90", showarrow=False, font=dict(size=13,family="Arial Black"))
-    fig.add_annotation(x=0, y=len(cat_grupo_existentes), text="Jugador     Jornada", showarrow=False, font=dict(size=13,family="Arial Black"))
-    fig.add_annotation(x=120, y=len(cat_grupo_existentes), text="P90", showarrow=False, font=dict(size=13,family="Arial Black"))
+        # Normalizar a porcentaje
+        if valor_ap24 != 0:
+            val_cl25 = (valor_cl25 * 100) / valor_ap24
+        else:
+            val_cl25 = 0 
+
+
+        fig.add_trace(go.Bar(
+            y=[cat], x=[ -val_cl25], orientation='h',
+            marker_color=obtener_color(val_cl25), text=[f"{val_cl25:.0f}"],
+            textposition="outside", showlegend=(i == 0), width=0.35, name="CL25"
+        ))
+
+        fig.add_trace(go.Scatter(
+            x=[-130], y=[cat], mode="text", text=[f"{valor_ap24:.2f}"],
+            textposition="middle left", showlegend=False
+        ))
+
+
+    # Encabezados
+    fig.add_annotation(x=0, y=len(cat_grupo_existentes), text= "Jugador", showarrow=False, font=dict(size=13, family="Arial Black"))
+    fig.add_annotation(x=-140, y=len(cat_grupo_existentes), text="P90", showarrow=False, font=dict(size=13,family="Arial Black"))
 
     fig.update_layout(
         barmode='overlay',
@@ -195,10 +197,12 @@ for i, cat in enumerate(cat_grupo_existentes):
         height=400 + 15 * len(cat_grupo_existentes)
     )
     fig.add_shape(
-        type="line", x0=0, x1=0,
+        type="line",
+        x0=0, x1=0,
         y0=-0.5, y1=len(cat_grupo_existentes) - 0.5,
         line=dict(color="white", width=4),
-        xref="x", yref="y", layer="above"
-    )
+        xref="x", yref="y",
+        layer="above" 
+        )
 
     st.plotly_chart(fig, use_container_width=True)
