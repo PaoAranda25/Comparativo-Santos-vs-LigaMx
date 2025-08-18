@@ -219,7 +219,7 @@ if analisis == "Leagues Cup":
 
         fig.update_layout(
             barmode='overlay',
-            xaxis=dict(showticklabels=False, range=[-220, 220]),  # ampliado
+            xaxis=dict(showticklabels=False, range=[-300, 300]),  # ampliado
             showlegend=False,
             height=400 + 15 * len(cols)
         )
