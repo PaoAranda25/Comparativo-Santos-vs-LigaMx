@@ -71,12 +71,6 @@ if analisis == "Leagues Cup":
     categorias = pd.read_csv("categorias_por_posicion_y_grupo_utf8.csv", encoding="utf-8-sig")
     # normaliza para coincidir
 
-    print (bd.columns)
-    print (bdap24.columns)
-    print (categorias.columns)
-    print (p90_actual.columns)
-    print (p90_anterior.columns)
-
 
     categorias.columns = (
         categorias.columns
@@ -198,24 +192,24 @@ if analisis == "Leagues Cup":
             # P90JUG (más alejado)
         # Nuevo orden de columnas de texto
             # P90 (promedio LC) → izquierda extrema
-            fig.add_trace(go.Scatter(x=[-250], y=[cat], mode="text", text=[f"{prom_lc:.2f}"],
+            fig.add_trace(go.Scatter(x=[-280], y=[cat], mode="text", text=[f"{prom_lc:.2f}"],
                                     textposition="middle right", showlegend=False))
             # P90JUG LC → antes del centro
-            fig.add_trace(go.Scatter(x=[-150], y=[cat], mode="text", text=[f"{v_lc:.2f}"],
+            fig.add_trace(go.Scatter(x=[-200], y=[cat], mode="text", text=[f"{v_lc:.2f}"],
                                     textposition="middle right", showlegend=False))
             # P90JUG TA → después del centro
-            fig.add_trace(go.Scatter(x=[150], y=[cat], mode="text", text=[f"{v_ta:.2f}"],
+            fig.add_trace(go.Scatter(x=[200], y=[cat], mode="text", text=[f"{v_ta:.2f}"],
                                     textposition="middle left", showlegend=False))
             # P90 (promedio TA) → derecha extrema
-            fig.add_trace(go.Scatter(x=[250], y=[cat], mode="text", text=[f"{prom_ta:.2f}"],
+            fig.add_trace(go.Scatter(x=[280], y=[cat], mode="text", text=[f"{prom_ta:.2f}"],
                                     textposition="middle left", showlegend=False))
 
         # Encabezados/estilo como tus comparativos
-        fig.add_annotation(x=-250, y=len(cols), text="P90", showarrow=False, font=dict(size=13,family="Arial Black"))
-        fig.add_annotation(x=-150, y=len(cols), text="P90JUG", showarrow=False, font=dict(size=13,family="Arial Black"))
+        fig.add_annotation(x=-280, y=len(cols), text="P90", showarrow=False, font=dict(size=13,family="Arial Black"))
+        fig.add_annotation(x=-170, y=len(cols), text="P90JUG", showarrow=False, font=dict(size=13,family="Arial Black"))
         fig.add_annotation(x=0,     y=len(cols), text="AP25   |   CL25", showarrow=False, font=dict(size=13,family="Arial Black"))
-        fig.add_annotation(x=150,  y=len(cols), text="P90JUG", showarrow=False, font=dict(size=13,family="Arial Black"))
-        fig.add_annotation(x=250,  y=len(cols), text="P90", showarrow=False, font=dict(size=13,family="Arial Black"))
+        fig.add_annotation(x=170,  y=len(cols), text="P90JUG", showarrow=False, font=dict(size=13,family="Arial Black"))
+        fig.add_annotation(x=280,  y=len(cols), text="P90", showarrow=False, font=dict(size=13,family="Arial Black"))
 
         fig.update_layout(
             barmode='overlay',
