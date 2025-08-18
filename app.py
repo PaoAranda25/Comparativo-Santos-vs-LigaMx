@@ -417,4 +417,8 @@ else:
             layer="above" 
             )
 
+<<<<<<< HEAD
         st.plotly_chart(fig, use_container_width=True)
+=======
+        st.plotly_chart(fig, use_container_width=True)
+>>>>>>> 75032f96 (feat: actualización comparativas con P90JUG y Leagues Cup)
