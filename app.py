@@ -169,9 +169,11 @@ if analisis == "Leagues Cup":
             prom_ta = float(pd.to_numeric(p90_anterior.loc[p90_anterior["POSICION"] == posicion, c], errors="coerce").fillna(0).values[0]) if c in p90_anterior.columns else 0.0
 
             # Referencia = máximo P90 del renglón (lo que será 100%)
-            ref = max(prom_lc, prom_ta)
-            pct_lc = (v_lc / ref * 100.0) if ref > 0 else 0.0
-            pct_ta = (v_ta / ref * 100.0) if ref > 0 else 0.0
+            ref_lc = prom_lc if pd.notna(prom_lc) and prom_lc > 0 else np.nan
+            ref_ta = prom_ta if pd.notna(prom_ta) and prom_ta > 0 else np.nan
+            
+            pct_lc = float(v_lc) / ref_lc * 100 if pd.notna(ref_lc) else 0.0
+            pct_ta = float(v_ta) / ref_ta * 100 if pd.notna(ref_ta) else 0.0
 
             # Barras en porcentaje (izq = LC, der = TA)
             fig.add_trace(go.Bar(
@@ -301,7 +303,7 @@ elif analisis == "Actual vs Anterior":
     # 8) Selección de jugador
     jugadores = bd_filtrada["JUGADOR"].dropna().unique()
     if len(jugadores) == 0:
-        st.warning("No hay jugadores disponibles para Leagues Cup.")
+        st.warning("No hay jugadores disponibles.")
         st.stop()
 
     jugador = st.selectbox("Selecciona un jugador", sorted(jugadores), index=0)
