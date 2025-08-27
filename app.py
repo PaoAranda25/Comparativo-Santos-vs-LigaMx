@@ -37,11 +37,11 @@ if analisis == "Leagues Cup":
         "BALONES PERDIDOS 3/4 DE CANCHA","BALONES PERDIDOS 4/4 DE CANCHA"
     ]
 
-    # 3) Calcular P90 (≥45 min)
+    # 3) Calcular P90 (≥90 min)
     def calc_p90(row, stat):
         mins = pd.to_numeric(row.get("MINUTOS JUGADOS", 0), errors="coerce")
         val  = pd.to_numeric(row.get(stat, 0), errors="coerce")
-        if pd.notna(val) and pd.notna(mins) and mins >= 1 and mins > 0:
+        if pd.notna(val) and pd.notna(mins) and mins >= 90 and mins > 0:
             return float(val) / (mins / 90.0)
         return 0.0
 
@@ -248,11 +248,11 @@ elif analisis == "Actual vs Anterior":
         "BALONES PERDIDOS 3/4 DE CANCHA","BALONES PERDIDOS 4/4 DE CANCHA"
     ]
 
-    # 3) Calcular P90 (≥45 min)
+    # 3) Calcular P90 (≥90 min)
     def calc_p90(row, stat):
         mins = pd.to_numeric(row.get("MINUTOS JUGADOS", 0), errors="coerce")
         val  = pd.to_numeric(row.get(stat, 0), errors="coerce")
-        if pd.notna(val) and pd.notna(mins) and mins >= 1 and mins > 0:
+        if pd.notna(val) and pd.notna(mins) and mins >= 90 and mins > 0:
             return float(val) / (mins / 90.0)
         return 0.0
 
@@ -656,7 +656,7 @@ else:
     def calc_p90(row, stat):
             mins = pd.to_numeric(row.get("MINUTOS JUGADOS", 0), errors="coerce")
             val  = pd.to_numeric(row.get(stat, 0), errors="coerce")
-            if pd.notna(val) and pd.notna(mins) and mins >= 1 and mins > 0:
+            if pd.notna(val) and pd.notna(mins) and mins >= 90 and mins > 0:
                 return float(val) / (mins / 90.0)
             return 0.0
 
