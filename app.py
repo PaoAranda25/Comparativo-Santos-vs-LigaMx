@@ -382,9 +382,12 @@ elif analisis == "Actual vs Anterior":
             prom_ta = float(pd.to_numeric(p90_anterior.loc[p90_anterior["POSICION"] == posicion, c], errors="coerce").fillna(0).values[0]) if c in p90_anterior.columns else 0.0
 
             # Referencia = máximo P90 del renglón (lo que será 100%)
-            ref = max(prom_lc, prom_ta)
-            pct_lc = (v_lc / ref * 100.0) if ref > 0 else 0.0
-            pct_ta = (v_ta / ref * 100.0) if ref > 0 else 0.0
+            ref_lc = prom_lc if np.isfinite(prom_lc) and prom_lc > 0 else np.nan
+            ref_ta = prom_ta if np.isfinite(prom_ta) and prom_ta > 0 else np.nan
+            
+            pct_lc = (v_lc / ref_lc * 100.0) if pd.notna(ref_lc) else 0.0
+            pct_ta = (v_ta / ref_ta * 100.0) if pd.notna(ref_ta) else 0.0
+
 
             # Barras en porcentaje (izq = LC, der = TA)
             fig.add_trace(go.Bar(
